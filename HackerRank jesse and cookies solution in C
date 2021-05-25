@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <string.h>
+#define SIZE 1000010
+long long Heap[SIZE];
+int lastIndex = 0;
+long long Parent(int index){
+	return (index-1)/2;
+}
+long long LeftChild(int index){
+	return (2*index) + 1;
+}
+long long RightChild(int index){
+	return (2*index) + 2;
+}
+void Swap(long long a ,long long b){
+	long long temp = Heap[a];
+	Heap[a]=Heap[b];
+	Heap[b]=temp;
+}
+void UpHeap(long long index){
+	long long parent;
+	if(index<=0){
+		return;
+	}
+	parent = Parent(index);
+	if(Heap[parent]<=Heap[index]){
+		return;
+	}
+	Swap(parent,index);
+	UpHeap(parent);
+}
+void Insert(long long n){
+	if(lastIndex>=SIZE){
+		return;
+	}
+	Heap[lastIndex]=n;
+	lastIndex++;
+	UpHeap(lastIndex-1);
+}
+void DownHeap(long long index){
+	if(index>=lastIndex){
+		return;
+	}
+	long long Left = LeftChild(index);
+	long long Right = RightChild(index);
+	long long min = index;
+	if(Left<lastIndex && Heap[Left]<Heap[min]){
+		min = Left;
+	}
+	if(Right<lastIndex && Heap[Right]<Heap[min]){
+		min = Right;
+	}
+	if(min == index){
+		return;
+	}
+	Swap(index,min);
+	DownHeap(min);
+}
+long long Delete(){
+	long long del;
+	del = Heap[0];
+	Heap[0]=Heap[lastIndex-1];
+	lastIndex--;
+	DownHeap(0);
+	return del;
+}
+
+long long Solve(int k,int n){
+	long long temp=0;
+	long long first,second,sweat;
+	if(Heap[0]>k){
+		return 0;
+	}
+	do{
+		first = Delete();
+		second = Delete();
+		sweat = first+2*second;
+		Insert(sweat);
+		temp++;
+		if(temp>=n-1&&Heap[0]<k){
+			return -1;
+		}
+	}while(Heap[0]<k);
+	return temp;
+}
+int main (){
+	int n,k;
+	long long a,ans;
+	scanf("%d %d",&n,&k);
+	getchar();
+	for(int i=0;i<n;i++){
+		scanf("%lld",&a);
+		Insert(a);
+	}	
+	printf("%lld\n",Solve(k,n));
+}
